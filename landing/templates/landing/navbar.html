@@ -1,0 +1,42 @@
+<div class="container">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand"
+      {% if user.is_authenticated %}
+      href = "{% url 'post-list'%}"
+      {% else %} 
+      href="{% url 'index' %}"
+      {% endif %}>
+      <i class="fas fa-comment"></i>
+      Social Network</a>
+      
+    </div>
+  
+    
+    <form class="d-flex me-3">
+      <div class="input-group">
+        <span class="input-group-text" id="basic-addon1">@</span>
+        <input type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+      </div>
+    </form>
+    <div class="dropdown me-3">
+    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fa-solid fa-user-large"></i>
+    </a>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item" href="http://127.0.0.1:8000">Home</a></li>
+      <li><a class="dropdown-item" href="http://127.0.0.1:8000/accounts/login">Login</a></li>
+      <li><a class="dropdown-item" href="http://127.0.0.1:8000/accounts/signup">Sign up</a></li>
+      <li><a class="dropdown-item" href="http://127.0.0.1:8000/accounts/logout">Log out</a></li>
+      <li><a class="dropdown-item" href="http://127.0.0.1:8000/social">Social</a></li>
+      <li><a class="dropdown-item" href="http://127.0.0.1:8000/admin">Admin</a></li>
+      {% if user.is_authenticated %}
+      <li><a class="dropdown-item" href="{% url 'profile' user.profile.pk %}">Profile</a></li>
+      <li><a class="dropdown-item" href="http://127.0.0.1:8000/admin">Sign out</a></li>
+      {% endif %}
+    </ul>
+  </div>
+  
+</nav>
+{% comment %} {{  user.is_authenticated }} {% endcomment %}
+</div>
