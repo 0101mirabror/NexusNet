@@ -10,32 +10,102 @@
         </div> 
     </div>
     <div class="row justify-content-center mt-5">
-        <div class="card shadow-sm col-md-8 col-sm-12 border-bottom px-5 pt-3">
-            <img src="{{profile.picture.url}}" class="rounded-circle" width="100" height="100" />
-            {% if profile.name %}
-                <h3 class="py-4">{{profile.name }}
-            {% endif %}
-            {% if profile.bio %}
-                <h3 class="py-4">{{profile.bio }}
-            {% endif %}
-            {% if profile.birth_date %}
-                <h3 class="py-4">{{profile.birth_date  }}
-            {% endif %}
-            {% if profile.location %}
-                <h3 class="py-4">{{profile.location  }}
-            {% endif %}
+        <div class="card shadow col-md-8 col-sm-12 border-bottom px-5 pt-3">
+            <div class="text-center"> 
+                <img src="{{profile.picture.url}}" class="rounded-circle mb-3" width="100" height="100" />
+                {% if profile.name %}
+                    {% if request.user == user %}
+                        <span>
+                            <h3 class="py-4">{{profile.name }}
+                                <a href="{% url 'profile-edit' profile.pk %}" class="edit-color">
+                                <i class="far fa-edit"></i></a> 
+                            </h3> 
+                        </span>
+                    {% else %}
+                        <h3 class="py-4">{{ user.username }}
+                            <span>
+                                {% if request.user == user %}
+                                <a href="{% url 'profile-edit' profile.pk %}" class="edit-color">
+                                <i class="far fa-edit"></i></a>  
+                                {% endif %}
+                            </span>
+                        </h3>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="mb-3">
+                {% if profile.bio %}
+                    <p><b>Bio: </b>{{profile.bio }}</p>
+                {% endif %}
+                    <p>Followers: {{ number_of_followers }}</p>
+                {% if user == request.user %}
+                {% else %}
+                    {% if is_following %}
+                        <form method='POST' action="{% url 'remove-follower' profile.pk %}">
+                            {% csrf_token %}
+                            <button class="btn btn-outline-danger" type="submit">Unfollow</button>
+                        </form>
+                    {% else %}
+                        <form method="POST" action="{% url 'add-follower' profile.pk %}">
+                            {% csrf_token %}
+                            <button class="btn btn-outline-success" type="submit">Follow</button> 
+                        </form>
+                    {% endif %}
+                {% endif %}
+            </div>
         </div> 
     </div>
+    <!--bio, birthday_date, location card-->
+    <div class="row justify-content-center mt-5">
+        <div class="card shadow col-md-8 col-sm-12 border-bottom px-5 pt-3">
+            {% if profile.birth_date %}
+                <p><b>Birthday: </b>{{profile.birth_date  }}</p>
+            {% endif %}
+            {% if profile.location %}
+                <p><b>Location:  </b>{{profile.location  }}</p>
+            {% endif %}
+        </div>
+    </div>
      
-        {% for post in posts %}
+    {% for post in posts %}
         <div class="row justify-content-center mt-5">
-            <div class="col-md-8 col-sm-12 border-bottom position-relative">
-                <p><strong>{{ post.author }}</strong>: {{ post.created_on }}</p>
-                <p>{{ post.body }}</p>
-                <a href="{% url 'post-detail' post.pk %}" class="stretched-link"></a>
+            <div class="col-md-8 col-sm-12 border-bottom">
+                <div>
+                    <a href="{% url 'profile' post.author.profile.pk %}">
+                          <img src="{{post.author.profile.picture.url}}" class="round-circle post-img" style="border-radius:50px;" width="30" height="30">
+                    </a>
+                    <p class="post-text"><a class="text-primary post-link" href="{% url 'profile' post.author.profile.pk %}">
+                        @{{ post.author }}</a> : {{ post.created_on }}
+                    </p>
+                </div>
+                 <div class="position-relative">
+                    <p>{{ post.body }}</p>
+                    <a href="{% url 'post-detail' post.pk %}" class="stretched-link"></a>
+                </div>
+                <div class="d-flex flex-row">
+                    <form method="POST" action="{% url 'like' post.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}"/>
+                        <button style="background-color: transparent; border:none; box-shadow: none;" type="submit"> 
+                            <i class="far fa-thumbs-up"></i> <span>{{post.likes.all.count}}</span>
+                        </button> 
+                    </form>
+
+                    <form method="POST" action="{% url 'dislike' post.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}"/>
+                        <button style="background-color: transparent; border:none; box-shadow: none;" type="submit">
+                            <i class="far fa-thumbs-down"></i> <span>{{post.dislikes.all.count}}</span>
+
+
+                        </button> 
+
+                    </form>
+
+                </div>
             </div> 
         </div>
-        {% endfor %}
-    </div>
+    {% endfor %}
+</div>
 
 {% endblock content %}
